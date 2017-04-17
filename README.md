@@ -32,70 +32,106 @@ Phong Reflection Model是经典的光照模型，它计算光照包括三个部�
 * 冯氏着色：与古罗着色对应即是在片段着色器中，对法向量与坐标进行插值，然后再通过冯氏反射模型计算出每个像素点的颜色值，从而使离散的顶点计算出来的离散的颜色变得连续而光滑。我们直接把环境光、漫反射光、镜面反射光的计算拿到片段着色器中计算即可完成修改，那么法向量、观察向量、入射向量同理需要传递给片段着色器，而不再是直接传递一个颜色。<br> 
 * Blinn冯氏着色：类似于与冯氏着色模型，只是Blinn-Phong模型镜面光的计算，采用了半角向量，这个向量是光照向量L和观察向量V的取中向量H，通过计算这个取中向量H与法向量N的夹角来得到镜面发射光强度，如下图所示：<br> 
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/图片28.png)<br>
+## Code
+* 光照计算
+```cg
+      output OUT;
+      float3 N = normalize(IN.normal);//计算法向量
+      float3 P = IN.objectPos;
+      float3 L = normalize(LightPosition - P);//计算入射向量
+      float NdotL = max(dot(N,L),0);//入射向量与法向量夹角
+      float3 ambient = Ka * I;//环境光
+      float3 diffuse = Kd * I * NdotL;//漫反射光
+      float3 V = normalize(eyePosition - P);//眼睛-物体连线向量  
 
-```cpp
-glRotatef(i, -1, 0, 0);//控制上胳膊与下胳膊旋转i度  
-glPushMatrix();//矩阵压栈并在栈顶复制一份
-glTranslatef(0.0, -1, 0.0);//移动到右下胳膊处
-glRotatef(ii, -1, 0, 0);//控制下胳膊旋转ii度 
-drawSkewed(1, 1.5, 1, WIRE);//绘制右下胳膊
-glPopMatrix();//栈顶矩阵出栈  回到大胳膊处
-drawSkewed(1, 1.5, 1, WIRE);//绘制右上胳膊
-glPopMatrix();//栈顶矩阵出栈  回到右肩膀处
+ //Phong光照模型
+      float3 R=reflect(-L,N);//计算反射光线向量
+      R=normalize(R);
+      float NdotH = pow(max(dot(V,R), 0), shininess);//反射光与视角的夹角
+ //BlinnPhong光照模型
+      //  float3 H = normalize(L+V);
+      //  float NdotH = pow(max(dot(N,H), 0), shininess);
+
+      if(NdotL<=0)
+           NdotH = 0.0;
+      float3 specular = Ks*I*NdotH;//镜面发射光
+      float3 color = ambient + diffuse + specular;//所有成分相加
+      OUT.color.xyz= color;
+      OUT.color.w = 1.0;
+      return OUT;
 ```
+* 古罗着色
+01vs.cg:<br>
+```cg
+struct output
+{
+      float4 position : POSITION; 
+      float4 color     : COLOR; 
+};
+ 
+output vs_main( float4 position : POSITION,
+                     float3 normal   : NORMAL,
+                     uniform float4x4 MV, // 在相机坐标系中计算，所以要用到ModelView变换矩阵
+                     uniform float4x4 MVP // ModelViewProjection变换矩阵
+                    )
+{
 
-具体考虑旋转与位移：<br>
-* 先让左大、小胳膊共同旋转i（0-45）度，然后左小胳膊独自向上旋转ii（0-15）度；与此同时右大、小腿旋转，旋转角度与胳膊同步也为i，但是右小腿同时往回旋转i度，使小腿保持垂直
-* 然后小胳膊开始往回旋转ii（15-0）度，然后大小胳膊同时往回旋转i（45-0）度；与此同时右大、小腿往回旋转，角度与胳膊同步角度为i，右小腿为-i
-* 当左小胳膊往回旋转到0度即ii=0时，右大小胳膊、左大小腿开始旋转，旋转情况与前面相同（ii1、i1）
-* 当左小胳膊或者右小胳膊到达最高度15度时，向前移动一步（des）<br>
-角度、位移控制代码：<br>
-```cpp
-	//i控制右胳膊和左腿  ii控制右小胳膊
-	if (i < 0) {//大胳膊 小胳膊旋转到小于0度时  开始增加i
-		a = 1;
-	}
-	if (i == 45) {//大胳膊 小胳膊旋转到45度时  保持i不变 开始调整ii
-		a = 0;
-		if (ii > 15) {//小胳膊旋转到大于15度时  开始减小ii
-			b = -1;
-			
-		}
-		if (ii < 0) {//小胳膊旋转到小于0度时  开始减小i  同时将b置为1
-			b = 1;
-			a = -1;
-			c = c + 1;//i摆回到0度时c非0
-			
-		}
-		ii = ii + b;
-	}
-	i = i + a;
+   //光照计算
 
-	//当c非0时开始摆动左胳膊和左腿
-	//i1控制左胳膊和左腿  ii1控制左小胳膊
-	if (c != 0) {
-		if (i1 < 0) {
-			a1 = 1;
-		}
-		if (i1 == 45) {
-			a1 = 0;
-			if (ii1 > 15) {
-				b1 = -1;
-
-			}
-			if (ii1 < 0) {
-				b1 = 1;
-				a1 = -1;
-			}
-			ii1 = ii1 + b1;
-		}
-		i1 = i1 + a1;
-	}
-	//小胳膊旋转到15度时 开始移动一步
-	if (ii1 ==15||ii==15) {
-		des++;
-	}
+}
 ```
+01fs.cg:<br>
+```cg
+float4 fs_main( float4 color    : COLOR ) : COLOR
+{
+      return color;
+}  
+```
+在顶点着色器中对所有顶点进行光照计算，得到每个顶点的颜色，在将输出的所有顶点颜色作为参数输入片段着色器，片段着色器根据每个三角形片的顶点颜色差值得到所有像素的颜色，从而实现了古罗着色模型。<br>
+* 冯氏着色
+02vs.cg:<br>
+```cg
+struct output
+{
+      float4 position  : POSITION;    
+      float3 objectPos : TEXCOORD0;  //顶点坐标传入fragment shader ，然后插值
+      float3 normal     : TEXCOORD1;//法向量传入fragment shader，然后插值
+};
+ 
+output vs_main( float4 position : POSITION,
+                  float3 normal   : NORMAL,
+                  uniform float4x4 MV,
+                  uniform float4x4 MVP
+                    )
+{
+      output OUT;
+      OUT.position = mul(MVP, position);//顶点位置转换到裁剪坐标
+      OUT.objectPos = mul(MV, position).xyz;//转换到相机坐标
+      OUT.normal = mul(MV, float4(normal,0.0)).xyz;//计算相机坐标下的法向量
+ 
+      return OUT;
+}
+```
+01fs.cg:<br>
+```cg
+struct input{//传入每个顶点的在相机坐标的位置信息和法向量，插值得到每个像素点的
+      float3 objectPos: TEXCOORD0;   
+      float3 normal   : TEXCOORD1;
+};
+ 
+struct output{
+      float4 color     : COLOR;
+};
+ 
+output fs_main( in input IN )//为每个像素点计算color
+{
+     //光照计算
+
+}
+```
+在顶点着色器中将所有顶点的坐标转换到相机坐标、计算出每个顶点的法向量并将它们传入片段着色器，片段着色器自动插值得到所有像素点的相机坐标和法向量，最后通过光照计算得到每个像素点的颜色<br>
+* Blinn冯氏着色
+实现方式类似于冯氏着色，只是在计算镜面反射时用到的夹角不同<br>
 
 ## Display
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/EV~2017.04_clip2.gif)<br>
