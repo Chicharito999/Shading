@@ -20,7 +20,7 @@ Choose one and use at least two different method such as Phong model, Gouraud mo
 * 镜面反射光：镜面光成分模拟的是物体表面光滑时反射的高亮的光，镜面光反映的通常是光的颜色，而不是物体的颜色。镜面反射光的亮度与反射光线和人的眼睛与物体表面的连线成正比。<br>
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/图片27.png)<br>
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/图片26.png)<br>
-　　得到3类光的RGB分量之后，与物体表面材质的RGB反射分量相乘即可获得光照射之后物体表面颜色。<br>
+　得到3类光的RGB分量之后，与物体表面材质的RGB反射分量相乘即可获得光照射之后物体表面颜色。<br>
  
 ### CG编写Shader：
 　　如果在openGL中使用CG(C for Graphic)语言，首先要下载并安装 NVIDIA的Cg Toolkit，然后在项目中的附加包含目录中添加头文件目录，在附加库目录中添加库文件目录，在附加依赖项中添加cg.lib cgGL.lib就可以在程序中使用了。<br>
@@ -137,9 +137,9 @@ output fs_main( in input IN )//为每个像素点计算color
 视频链接：http://www.bilibili.com/video/av9903444/<br>
 截图：<br>
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/Gouraud.png)<br>
-                                    　　　　　　　Gouraud Shading<br>
+                                    　　　　　　　　　Gouraud Shading<br>
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/Phong.png)<br>
-                                　  　　　　　　  Phong Shading<br>
+                                　  　　　　　　　　  Phong Shading<br>
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/BlinnPhong.png) <br>
-                                   　　　　　　　 BlinnPhong Shading<br>
+                                   　　　　　　　　　 BlinnPhong Shading<br>
                   
