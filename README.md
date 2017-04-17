@@ -136,7 +136,7 @@ output fs_main( in input IN )//为每个像素点计算color
 ## Display
 视频链接：<br>
 截图：<br>
-![](https://github.com/Chicharito999/ImageCache/raw/master/image/Gouraud shading.png)<br>
-![](https://github.com/Chicharito999/ImageCache/raw/master/image/Phong shading.png)<br>
-![](https://github.com/Chicharito999/ImageCache/raw/master/image/BlinnPhong shading.png) 
+![](https://github.com/Chicharito999/ImageCache/raw/master/image/Gouraud.png)<br>
+![](https://github.com/Chicharito999/ImageCache/raw/master/image/Phong.png)<br>
+![](https://github.com/Chicharito999/ImageCache/raw/master/image/BlinnPhong.png) 
   
