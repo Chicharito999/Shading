@@ -134,7 +134,7 @@ output fs_main( in input IN )//为每个像素点计算color
 实现方式类似于冯氏着色，只是在计算镜面反射时用到的夹角不同<br>
 
 ## Display
-视频链接：<br>
+视频链接：[![https://github.com/Chicharito999/ImageCache/raw/master/image/bilibili.png]](https://github.com/Chicharito999/ImageCache/raw/master/image/Gouraud.png)<br>
 截图：<br>
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/Gouraud.png)<br>
 ![](https://github.com/Chicharito999/ImageCache/raw/master/image/Phong.png)<br>
