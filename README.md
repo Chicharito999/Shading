@@ -113,7 +113,7 @@ output vs_main( float4 position : POSITION,
       return OUT;
 }
 ```
-01fs.cg:<br>
+02fs.cg:<br>
 ```cg
 struct input{//传入每个顶点的在相机坐标的位置信息和法向量，插值得到每个像素点的
       float3 objectPos: TEXCOORD0;   
