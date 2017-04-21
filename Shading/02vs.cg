@@ -1,0 +1,20 @@
+struct output
+{
+      float4 position  : POSITION;    
+      float3 objectPos : TEXCOORD0;  //顶点坐标传入fragment shader ，然后插值
+      float3 normal     : TEXCOORD1;//法向量传入fragment shader，然后插值
+};
+ 
+output vs_main( float4 position : POSITION,
+                  float3 normal   : NORMAL,
+                  uniform float4x4 MV,
+                  uniform float4x4 MVP
+                    )
+{
+      output OUT;
+      OUT.position = mul(MVP, position);//顶点位置转换到裁剪坐标
+      OUT.objectPos = mul(MV, position).xyz;//转换到相机坐标
+      OUT.normal = mul(MV, float4(normal,0.0)).xyz;//计算相机坐标下的法向量
+ 
+      return OUT;
+}
