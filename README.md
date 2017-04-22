@@ -1,4 +1,4 @@
-# Stickman
+# Ray-Tracing
 :sunny:Realize at least two different method such as Phong model, Gouraud model<br>
 __________________________________________________________________________________________
 Author:赵明福                                        Student ID：201400301087                            E-mail:1109646702@qq.com<br>
